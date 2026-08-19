@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="zorentia-compiler" content="{&quot;compiler_version&quot;:&quot;frontend-visual-compiler-v3&quot;,&quot;design_contract_hash&quot;:&quot;9f217d45fc2f6bb9cd7f999be6089af54913e660d27be48082696e8a137601a9&quot;,&quot;route&quot;:&quot;/login&quot;,&quot;screen_id&quot;:&quot;capability_data_persistence_8e00a8e9.screen.login&quot;}">
+  <title>Login - Homework Kanban Board · Homework Kanban Board</title>
+  <style data-zorentia-compiler="frontend-visual-compiler-v3">:root {
+  --primary:#6366F1; --primary-hover:#4338CA;
+  --background:#FFFFFF; --surface:#F8FAFC;
+  --surface-alt:#EEF0F7; --text:#1E293B;
+  --muted:#667085; --border:#E2E8F0;
+  --success:#10B981; --danger:#C0362C;
+  --radius:14px; --shadow:0 18px 48px rgba(25,31,50,.10);
+}
+* { box-sizing:border-box; }
+html { color-scheme:light; background:var(--background); }
+body { margin:0; min-height:100vh; background:var(--background); color:var(--text);
+  font-family:"Inter",ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased; }
+button,input,textarea,select { font:inherit; }
+a { color:inherit; text-decoration:none; }
+svg{display:inline-block;flex:none;vertical-align:middle;max-width:100%}
+svg[viewBox]:not([data-chart]):not(.chart){max-width:4rem!important;max-height:4rem!important}
+svg:not([width]):not([height]):not([data-chart]):not(.chart){width:1.25rem;height:1.25rem}
+button>svg,.button>svg,a>svg,.badge>svg,[data-icon],svg.lucide{width:1.125rem;height:1.125rem;flex:none}
+svg.w-3{width:.75rem!important}svg.h-3{height:.75rem!important}
+svg.w-4{width:1rem!important}svg.h-4{height:1rem!important}
+svg.w-5{width:1.25rem!important}svg.h-5{height:1.25rem!important}
+svg.w-6{width:1.5rem!important}svg.h-6{height:1.5rem!important}
+svg.w-7{width:1.75rem!important}svg.h-7{height:1.75rem!important}
+svg.w-8{width:2rem!important}svg.h-8{height:2rem!important}
+svg.w-10{width:2.5rem!important}svg.h-10{height:2.5rem!important}
+svg.w-12{width:3rem!important}svg.h-12{height:3rem!important}
+svg.w-16{width:4rem!important}svg.h-16{height:4rem!important}
+.icon-sm{width:1rem!important;height:1rem!important}.icon-md{width:1.25rem!important;height:1.25rem!important}.icon-lg{width:1.75rem!important;height:1.75rem!important}
+[hidden] { display:none !important; }
+.app-shell { display:grid; grid-template-columns:272px minmax(0,1fr); min-height:100vh; }
+.app-sidebar { position:sticky; top:0; z-index:20; height:100vh; display:flex; min-width:0;
+  flex-direction:column; overflow:auto; border-right:1px solid var(--border); background:var(--surface);
+  box-shadow:8px 0 32px rgba(15,23,42,.035); }
+.app-brand { display:flex; align-items:center; gap:12px; min-height:82px; padding:18px 22px;
+  border-bottom:1px solid var(--border); font-size:15px; font-weight:750; letter-spacing:-.02em; }
+.brand-mark { display:grid; width:38px; height:38px; flex:none; place-items:center; border-radius:12px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-hover)); color:white; font-size:16px;
+  box-shadow:0 10px 25px color-mix(in srgb,var(--primary) 28%,transparent); }
+.app-sidebar-content { display:flex; min-height:0; flex:1; flex-direction:column; padding:18px 14px; }
+.app-sidebar-content aside { display:flex; min-height:0; flex:1; flex-direction:column; }
+.app-sidebar-content nav { display:grid; gap:6px; }
+.app-sidebar-content nav a { display:flex; min-height:43px; align-items:center; gap:10px; border-radius:11px;
+  padding:0 13px; color:var(--muted); font-size:14px; font-weight:650; transition:.18s ease; }
+.app-sidebar-content nav a:hover,.app-sidebar-content nav a:focus-visible { color:var(--primary);
+  background:color-mix(in srgb,var(--primary) 9%,var(--surface)); outline:none; }
+.app-workspace { display:flex; min-width:0; min-height:100vh; flex-direction:column; }
+.app-header { position:sticky; top:0; z-index:15; min-height:74px; border-bottom:1px solid var(--border);
+  background:color-mix(in srgb,var(--surface) 92%,transparent); backdrop-filter:blur(14px); }
+.app-header > header { display:flex; min-height:74px; align-items:center; justify-content:space-between;
+  gap:18px; padding:14px clamp(22px,4vw,52px); }
+.app-main { width:100%; min-width:0; max-width:1560px; flex:1; margin:0 auto;
+  padding:38px clamp(22px,4vw,58px) 64px; }
+.app-footer { border-top:1px solid var(--border); color:var(--muted); background:var(--surface); }
+.app-footer > footer { padding:18px clamp(22px,4vw,52px); font-size:12px; }
+.page-header { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:28px; }
+.page-kicker { margin:0 0 8px; color:var(--primary); font-size:12px; font-weight:750;
+  letter-spacing:.12em; text-transform:uppercase; }
+.page-heading { margin:0; font-size:clamp(29px,4vw,44px); line-height:1.06; letter-spacing:-.045em; }
+.page-description { max-width:760px; margin:12px 0 0; color:var(--muted); line-height:1.7; }
+.panel-grid,.stats-grid,.form-grid,.card-grid { display:grid; gap:18px; }
+.panel-grid,.card-grid { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+.stats-grid { grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); }
+.form-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.panel,.data-card,.stat,.auth-card,.table-wrap { border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--surface); box-shadow:var(--shadow); }
+.panel,.data-card,.auth-card { padding:clamp(22px,3vw,32px); }
+.stat { padding:22px; }
+.stat-label { color:var(--muted); font-size:13px; font-weight:650; }
+.stat-value { margin-top:10px; font-size:31px; font-weight:760; letter-spacing:-.045em; }
+.panel-title { margin:0; font-size:19px; letter-spacing:-.025em; }
+.panel-copy { margin:8px 0 0; color:var(--muted); line-height:1.65; }
+.field { display:grid; gap:8px; } .field-full { grid-column:1/-1; }
+.label,label { color:var(--text); font-size:13px; font-weight:700; }
+.input,.textarea,.select,input:not([type="checkbox"]):not([type="radio"]),textarea,select { width:100%;
+  border:1px solid var(--border); border-radius:11px; padding:12px 14px; background:var(--surface);
+  color:var(--text); outline:none; transition:.18s ease; }
+.textarea,textarea { min-height:120px; resize:vertical; }
+.input:focus,.textarea:focus,.select:focus,input:focus,textarea:focus,select:focus { border-color:var(--primary);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--primary) 13%,transparent); }
+.toolbar,.actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; } .actions { margin-top:22px; }
+.button,button { display:inline-flex; min-height:42px; align-items:center; justify-content:center; gap:8px;
+  border:1px solid var(--border); border-radius:11px; padding:0 17px; cursor:pointer; background:var(--surface);
+  color:var(--text); font-weight:700; transition:transform .16s ease,background .16s ease,border-color .16s ease; }
+.button:hover,button:hover { transform:translateY(-1px); }
+.button:disabled,button:disabled { cursor:not-allowed; opacity:.6; transform:none; }
+.button-primary,button[type="submit"] { border-color:var(--primary); color:white; background:var(--primary); }
+.button-primary:hover,button[type="submit"]:hover { background:var(--primary-hover); }
+.button-secondary { border-color:var(--border); background:var(--surface); color:var(--text); }
+.badge { display:inline-flex; align-items:center; min-height:27px; border-radius:999px; padding:0 10px;
+  background:var(--surface-alt); color:var(--muted); font-size:12px; font-weight:700; }
+.alert { margin:14px 0; border-radius:11px; padding:12px 14px; font-size:13px; line-height:1.5; }
+.alert-error,[data-error-region] { border:1px solid color-mix(in srgb,var(--danger) 28%,transparent);
+  color:var(--danger); background:color-mix(in srgb,var(--danger) 7%,var(--surface)); }
+.alert-success,[data-success-region] { border:1px solid color-mix(in srgb,var(--success) 28%,transparent);
+  color:var(--success); background:color-mix(in srgb,var(--success) 7%,var(--surface)); }
+.empty-state { display:grid; min-height:220px; place-items:center; padding:36px; text-align:center;
+  border:1px dashed var(--border); border-radius:var(--radius); color:var(--muted); }
+.table-wrap { overflow:auto; } .table,table { width:100%; border-collapse:collapse; font-size:14px; }
+.table th,.table td,th,td { padding:14px 16px; border-bottom:1px solid var(--border); text-align:left; }
+.table th,th { color:var(--muted); background:var(--surface-alt); font-size:12px;
+  letter-spacing:.04em; text-transform:uppercase; }
+.generated-list { display:grid; gap:12px; }
+.generated-item { border:1px solid var(--border); border-radius:12px; padding:16px; background:var(--surface); }
+.generated-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px 16px; margin:0; }
+.generated-fields dt { color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+.generated-fields dd { margin:4px 0 0; overflow-wrap:anywhere; font-size:14px; font-weight:650; }
+[data-loading="true"] { pointer-events:none; opacity:.68; }
+.app-shell[data-layout="auth"] { grid-template-columns:1fr; }
+.app-shell[data-layout="auth"] .app-sidebar { display:none; }
+.app-shell[data-layout="auth"] .app-main { display:grid; max-width:none; place-items:center;
+  background:radial-gradient(circle at 12% 10%,color-mix(in srgb,var(--primary) 13%,transparent),transparent 35%),var(--background); }
+.app-shell[data-layout="auth"] .auth-card { width:min(100%,500px); }
+@media (max-width:860px) {
+  .app-shell { grid-template-columns:1fr; }
+  .app-sidebar { position:relative; height:auto; border-right:0; border-bottom:1px solid var(--border); }
+  .app-brand { min-height:66px; padding:13px 18px; }
+  .app-sidebar-content { padding:10px 14px 14px; }
+  .app-sidebar-content nav { grid-auto-flow:column; grid-auto-columns:max-content; overflow:auto; }
+  .app-header { position:relative; } .app-main { padding:28px 18px 48px; }
+  .page-header { align-items:flex-start; flex-direction:column; } .form-grid { grid-template-columns:1fr; }
+  .field-full { grid-column:auto; }
+}</style>
+</head>
+<body data-screen-route="/login">
+<div class="app-shell" data-layout="auth">
+  <aside class="app-sidebar" aria-label="Application navigation">
+    <div class="app-brand"><span class="brand-mark" aria-hidden="true">H</span><span>Homework Kanban Board</span></div>
+    <div class="app-sidebar-content"><aside class="app-sidebar"><div class="sidebar-content"><nav class="sidebar-nav"><div class="nav-section"><h3 class="nav-section-title">Main</h3><ul class="nav-list"><li class="nav-item"><a href="/board" class="nav-item-link"><svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="3" width="6" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="5" width="6" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="18" y="7" width="0" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg><span class="nav-item-text">Kanban Board</span></a></li><li class="nav-item"><a href="/board/responsive" class="nav-item-link"><svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="3" width="16" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M6 17H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 14V17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-item-text">Responsive View</span></a></li><li class="nav-item"><a href="/board/create-card" class="nav-item-link"><svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-item-text">Create Card</span></a></li></ul></div><div class="nav-section"><h3 class="nav-section-title">Setup</h3><ul class="nav-list"><li class="nav-item"><a href="/onboarding/subjects" class="nav-item-link"><svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6H16M4 10H16M4 14H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-item-text">Add Subjects</span></a></li><li class="nav-item"><a href="/board/responsive/preferences" class="nav-item-link"><svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 12C11.1046 12 12 11.1046 12 10C12 8.89543 11.1046 8 10 8C8.89543 8 8 8.89543 8 10C8 11.1046 8.89543 12 10 12Z" stroke="currentColor" stroke-width="1.5"/><path d="M16.3638 12.2236C16.2942 12.5 16.2594 12.7882 16.2594 13.0882C16.2594 13.3882 16.2942 13.6764 16.3638 13.9528L17.8764 14.8764L16.7 16.9L14.9 16.2C14.4 16.6 13.85 16.9 13.25 17.1L13 19H10.75L10.5 17.1C9.9 16.9 9.35 16.6 8.85 16.2L7.05 16.9L5.87361 14.8764L7.38625 13.9528C7.31667 13.6764 7.28188 13.3882 7.28188 13.0882C7.28188 12.7882 7.31667 12.5 7.38625 12.2236L5.87361 11.3L7.05 9.27361L8.85 9.97361C9.35 9.57361 9.9 9.27361 10.5 9.07361L10.75 7.17361H13L13.25 9.07361C13.85 9.27361 14.4 9.57361 14.9 9.97361L16.7 9.27361L17.8764 11.3L16.3638 12.2236Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-item-text">Preferences</span></a></li></ul></div><div class="nav-section"><h3 class="nav-section-title">Account</h3><ul class="nav-list"><li class="nav-item"><a href="/login" class="nav-item-link"><svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 14L17 10L13 6M17 10H7M7 2H5C4.46957 2 3.96086 2.21071 3.58579 2.58579C3.21071 2.96086 3 3.46957 3 4V16C3 16.5304 3.21071 17.0391 3.58579 17.4142C3.96086 17.7893 4.46957 18 5 18H7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-item-text">Login</span></a></li><li class="nav-item"><a href="/signup" class="nav-item-link"><svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 17V15.6667C14 14.9594 13.719 14.2811 13.219 13.781C12.7189 13.281 12.0406 13 11.3333 13H5.66667C4.95942 13 4.28115 13.281 3.78105 13.781C3.28095 14.2811 3 14.9594 3 15.6667V17M17 6V12M20 9H14M11 5.66667C11 7.13943 9.80609 8.33333 8.33333 8.33333C6.86057 8.33333 5.66667 7.13943 5.66667 5.66667C5.66667 4.19391 6.86057 3 8.33333 3C9.80609 3 11 4.19391 11 5.66667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-item-text">Sign Up</span></a></li><li class="nav-item"><a href="/logout" class="nav-item-link"><svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 14L3 10L7 6M3 10H13M13 2H15C15.5304 2 16.0391 2.21071 16.4142 2.58579C16.7893 2.96086 17 3.46957 17 4V16C17 16.5304 16.7893 17.0391 16.4142 17.4142C16.0391 17.7893 15.5304 18 15 18H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-item-text">Logout</span></a></li></ul></div></nav><div class="sidebar-footer"><div class="sidebar-status"><span class="status-indicator"></span><span class="status-text">All tasks synced</span></div></div></div></aside></div>
+  </aside>
+  <div class="app-workspace">
+    <div class="app-header"><header class="app-header"><div class="container"><div class="header-content"><div class="header-brand"><a href="/board" class="brand-link"><svg class="brand-icon" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="6" width="8" height="20" rx="2" fill="currentColor" opacity="0.6"/><rect x="14" y="10" width="8" height="16" rx="2" fill="currentColor" opacity="0.8"/><rect x="24" y="14" width="4" height="12" rx="2" fill="currentColor"/></svg><span class="brand-name">Homework Kanban</span></a></div><button class="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></button><nav class="header-nav"><a href="/board" class="nav-link">Board</a><a href="/board/responsive" class="nav-link">Responsive View</a><a href="/onboarding/subjects" class="nav-link">Subjects</a></nav><div class="header-actions"><button class="btn-icon" aria-label="Notifications"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 6.66669C15 5.34061 14.4732 4.06883 13.5355 3.13115C12.5979 2.19347 11.3261 1.66669 10 1.66669C8.67392 1.66669 7.40215 2.19347 6.46447 3.13115C5.52678 4.06883 5 5.34061 5 6.66669C5 12.5 2.5 14.1667 2.5 14.1667H17.5C17.5 14.1667 15 12.5 15 6.66669Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.4417 17.5C11.2952 17.7526 11.0849 17.9622 10.8319 18.1079C10.5789 18.2537 10.292 18.3304 10 18.3304C9.70802 18.3304 9.42112 18.2537 9.16811 18.1079C8.9151 17.9622 8.70484 17.7526 8.55835 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="user-menu"><button class="user-avatar" aria-label="User menu"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.6667 17.5V15.8333C16.6667 14.9493 16.3155 14.1014 15.6904 13.4763C15.0652 12.8512 14.2174 12.5 13.3333 12.5H6.66667C5.78261 12.5 4.93477 12.8512 4.30964 13.4763C3.68452 14.1014 3.33333 14.9493 3.33333 15.8333V17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9.16667C11.8409 9.16667 13.3333 7.67428 13.3333 5.83333C13.3333 3.99238 11.8409 2.5 10 2.5C8.15905 2.5 6.66667 3.99238 6.66667 5.83333C6.66667 7.67428 8.15905 9.16667 10 9.16667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div></div></div></header></div>
+    <main id="main-content" class="app-main"><div class="auth-card">
+  <div style="text-align: center; margin-bottom: 32px;">
+    <svg class="icon-lg" style="margin: 0 auto 16px; color: #6366F1;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+    </svg>
+    <h1 style="font-size: 28px; font-weight: 700; color: #1E293B; margin: 0 0 8px 0;">Welcome Back</h1>
+    <p style="font-size: 15px; color: #667085; margin: 0;">Sign in to access your homework board</p>
+  </div>
+
+  <form data-action-id="capability_data_persistence_8e00a8e9.screen-action.submit_login">
+    <div class="form-grid">
+      <div class="field field-full">
+        <label class="label" for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          class="input" 
+          placeholder="student@school.edu"
+          required
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="field field-full">
+        <label class="label" for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="input" 
+          placeholder="Enter your password"
+          required
+          autocomplete="current-password"
+        />
+      </div>
+
+      <div class="alert alert-error" style="display: none;" data-error="INVALID_CREDENTIALS">
+        <svg class="icon-sm" style="flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>Email or password is incorrect</span>
+      </div>
+
+      <div class="field field-full">
+        <button type="submit" class="button button-primary" style="width: 100%;">
+          Sign In
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <div style="margin-top: 24px; text-align: center; padding-top: 24px; border-top: 1px solid #E2E8F0;">
+    <p style="font-size: 14px; color: #667085; margin: 0;">
+      Don't have an account? 
+      <a href="/signup" style="color: #6366F1; font-weight: 600; text-decoration: none;">Sign up</a>
+    </p>
+  </div>
+</div></main>
+    <div class="app-footer"><footer class="app-footer"><div class="container"><div class="footer-content"><div class="footer-section"><p class="footer-brand">Homework Kanban Board</p><p class="footer-tagline">Organize your assignments with ease</p></div><div class="footer-section"><h4 class="footer-heading">Quick Links</h4><ul class="footer-links"><li><a href="/board" class="footer-link">Board</a></li><li><a href="/board/create-card" class="footer-link">Create Task</a></li><li><a href="/onboarding/subjects" class="footer-link">Manage Subjects</a></li></ul></div><div class="footer-section"><h4 class="footer-heading">Account</h4><ul class="footer-links"><li><a href="/login" class="footer-link">Login</a></li><li><a href="/signup" class="footer-link">Sign Up</a></li><li><a href="/board/responsive/preferences" class="footer-link">Settings</a></li></ul></div><div class="footer-section"><h4 class="footer-heading">Status</h4><div class="footer-status"><div class="status-row"><span class="status-label">To Do</span><span class="status-badge status-badge-todo">Active</span></div><div class="status-row"><span class="status-label">In Progress</span><span class="status-badge status-badge-progress">Active</span></div><div class="status-row"><span class="status-label">Done</span><span class="status-badge status-badge-done">Active</span></div></div></div></div><div class="footer-bottom"><p class="footer-copyright">&copy; 2024 Homework Kanban. Built for students, by students.</p><div class="footer-meta"><span class="footer-version">v1.0.0</span><span class="footer-separator">•</span><span class="footer-pwa">PWA Enabled</span></div></div></div></footer></div>
+<script src="/__frontend_assets/frontend/features/data_persistence/login.js" defer></script>
+  </div>
+</div>
+</body>
+</html>

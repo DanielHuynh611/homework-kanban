@@ -1,0 +1,186 @@
+{
+  "normalizations": {
+    "legacy_tailwind_runtime_removed": []
+  },
+  "project_slug": "homework-kanban-board",
+  "route_collisions": [
+    {
+      "registered_path": "frontend/features/data_persistence/login.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.login",
+      "route": "/login",
+      "unregistered_path": "frontend/features/browser_based_platform/login_screen.html",
+      "unregistered_screen_id": "capability_browser_based_platform_b7688c8b.screen.login"
+    },
+    {
+      "registered_path": "frontend/features/data_persistence/sign_up.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.signup",
+      "route": "/signup",
+      "unregistered_path": "frontend/features/account_creation/sign_up.html",
+      "unregistered_screen_id": "capability_account_creation_40702744.screen.signup"
+    },
+    {
+      "registered_path": "frontend/features/data_persistence/login.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.login",
+      "route": "/login",
+      "unregistered_path": "frontend/features/account_creation/login.html",
+      "unregistered_screen_id": "capability_account_creation_40702744.screen.login"
+    },
+    {
+      "registered_path": "frontend/features/data_persistence/sign_up.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.signup",
+      "route": "/signup",
+      "unregistered_path": "frontend/features/secured_database_storage/sign_up.html",
+      "unregistered_screen_id": "capability_secured_database_storage_8df07551.screen.signup"
+    },
+    {
+      "registered_path": "frontend/features/data_persistence/login.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.login",
+      "route": "/login",
+      "unregistered_path": "frontend/features/secured_database_storage/login.html",
+      "unregistered_screen_id": "capability_secured_database_storage_8df07551.screen.login"
+    },
+    {
+      "registered_path": "frontend/features/data_persistence/kanban_board.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.kanban_board",
+      "route": "/board",
+      "unregistered_path": "frontend/features/three_column_kanban_board/kanban_board.html",
+      "unregistered_screen_id": "capability_three_column_kanban_board_7897884e.screen.kanban_board"
+    },
+    {
+      "registered_path": "frontend/features/data_persistence/add_subjects_onboarding.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.onboarding_subjects",
+      "route": "/onboarding/subjects",
+      "unregistered_path": "frontend/features/add_subjects_during_onboarding/add_subjects_onboarding.html",
+      "unregistered_screen_id": "capability_add_subjects_during_onboarding_c90dae67.screen.add_subjects_onboarding"
+    },
+    {
+      "registered_path": "frontend/features/data_persistence/sign_up.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.signup",
+      "route": "/signup",
+      "unregistered_path": "frontend/features/password_hashing/account_creation.html",
+      "unregistered_screen_id": "capability_password_hashing_ea5acd92.screen.account_creation"
+    },
+    {
+      "registered_path": "frontend/features/data_persistence/login.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.login",
+      "route": "/login",
+      "unregistered_path": "frontend/features/password_hashing/login.html",
+      "unregistered_screen_id": "capability_password_hashing_ea5acd92.screen.login"
+    },
+    {
+      "registered_path": "frontend/features/data_persistence/kanban_board.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.kanban_board",
+      "route": "/board",
+      "unregistered_path": "frontend/features/visual_urgency_indicators/kanban_board_with_urgency_indicators.html",
+      "unregistered_screen_id": "capability_visual_urgency_indicators_79524665.screen.kanban_board_with_urgency"
+    },
+    {
+      "registered_path": "frontend/features/data_persistence/kanban_board.html",
+      "registered_screen_id": "capability_data_persistence_8e00a8e9.screen.kanban_board",
+      "route": "/board",
+      "unregistered_path": "frontend/features/drag_and_drop_task_movement/kanban_board.html",
+      "unregistered_screen_id": "capability_drag_and_drop_task_movement_a0308110.screen.kanban_board"
+    }
+  ],
+  "runtime_verification": {
+    "errors": [
+      "frontend_application_boot_failed"
+    ],
+    "valid": false
+  },
+  "schema_version": "frontend-package-manifest-v3",
+  "screen_routes": [
+    {
+      "feature_id": "capability_data_persistence_8e00a8e9",
+      "path": "frontend/features/data_persistence/sign_up.html",
+      "route": "/signup",
+      "screen_id": "capability_data_persistence_8e00a8e9.screen.signup"
+    },
+    {
+      "feature_id": "capability_data_persistence_8e00a8e9",
+      "path": "frontend/features/data_persistence/login.html",
+      "route": "/login",
+      "screen_id": "capability_data_persistence_8e00a8e9.screen.login"
+    },
+    {
+      "feature_id": "capability_data_persistence_8e00a8e9",
+      "path": "frontend/features/data_persistence/add_subjects_onboarding.html",
+      "route": "/onboarding/subjects",
+      "screen_id": "capability_data_persistence_8e00a8e9.screen.onboarding_subjects"
+    },
+    {
+      "feature_id": "capability_data_persistence_8e00a8e9",
+      "path": "frontend/features/data_persistence/kanban_board.html",
+      "route": "/board",
+      "screen_id": "capability_data_persistence_8e00a8e9.screen.kanban_board"
+    },
+    {
+      "feature_id": "capability_data_persistence_8e00a8e9",
+      "path": "frontend/features/data_persistence/create_task_modal.html",
+      "route": "/board#create-task",
+      "screen_id": "capability_data_persistence_8e00a8e9.screen.create_task_modal"
+    },
+    {
+      "feature_id": "capability_responsive_design_8e006bb8",
+      "path": "frontend/features/responsive_design/responsive_kanban_board.html",
+      "route": "/board/responsive",
+      "screen_id": "capability_responsive_design_8e006bb8.screen.board_responsive"
+    },
+    {
+      "feature_id": "capability_responsive_design_8e006bb8",
+      "path": "frontend/features/responsive_design/layout_preferences_settings.html",
+      "route": "/board/responsive/preferences",
+      "screen_id": "capability_responsive_design_8e006bb8.screen.layout_preferences"
+    },
+    {
+      "feature_id": "capability_browser_based_platform_b7688c8b",
+      "path": "frontend/features/browser_based_platform/registration_screen.html",
+      "route": "/register",
+      "screen_id": "capability_browser_based_platform_b7688c8b.screen.register"
+    },
+    {
+      "feature_id": "capability_browser_based_platform_b7688c8b",
+      "path": "frontend/features/browser_based_platform/session_validator.html",
+      "route": "/validate-session",
+      "screen_id": "capability_browser_based_platform_b7688c8b.screen.session_validator"
+    },
+    {
+      "feature_id": "capability_browser_based_platform_b7688c8b",
+      "path": "frontend/features/browser_based_platform/logout_handler.html",
+      "route": "/logout",
+      "screen_id": "capability_browser_based_platform_b7688c8b.screen.logout_handler"
+    },
+    {
+      "feature_id": "capability_create_homework_cards_384935a0",
+      "path": "frontend/features/create_homework_cards/create_homework_card_modal.html",
+      "route": "/board/create-card",
+      "screen_id": "capability_create_homework_cards_384935a0.screen.create_card_modal"
+    },
+    {
+      "feature_id": "capability_create_homework_cards_384935a0",
+      "path": "frontend/features/create_homework_cards/homework_card_display.html",
+      "route": "/board/cards",
+      "screen_id": "capability_create_homework_cards_384935a0.screen.card_display"
+    }
+  ],
+  "source": {
+    "architecture_workspace_id": "3ffc75c5-1c26-488a-a160-e88b7020718d",
+    "backend_package_hash": "29cc0349beb6885ae1d31596eefa90814c9a3721deea4aa7f42733dfa23dc186",
+    "backend_package_id": "fdd327d0-8bcc-4b24-8946-8a003be9155c",
+    "backend_workspace_id": "048636e7-1ca8-4de0-b435-a96dac9f1687",
+    "feature_hashes": {
+      "capability_account_creation_40702744": "16160a3b4cfb8dabc01fd74c7e8642413bc62c399a9bd6a7d7365bfa4517a55f",
+      "capability_add_subjects_during_onboarding_c90dae67": "8a91cf5d540c8a6539a8bdd20657e7214e5e1b1a3ed223a3eecdb4170d3be611",
+      "capability_browser_based_platform_b7688c8b": "59ee773eea193bd729fa43408213acbc9752883190c6b55a281e8a3a4f8e9d00",
+      "capability_create_homework_cards_384935a0": "2224337fc1fdd3c60fbbb9209aa053ef0064538171e4857c88f7fb8b8377c09f",
+      "capability_data_persistence_8e00a8e9": "7b31d141b983df651afc0313193b1ca1bad9e732c896554ecad9bf75b7186a8b",
+      "capability_drag_and_drop_task_movement_a0308110": "d602ec9b31ab79f6293bce60fd24197aea712ebd9f8ea16674f399f47286a64a",
+      "capability_password_hashing_ea5acd92": "b6b90bcdb48e8d548e367b8c8e3e98ac06558fcb6fa7f477b05e89e312ad8988",
+      "capability_responsive_design_8e006bb8": "c260221e6d6edae28a03e56c7228880520c38020a3cd355ef7ae5fcf71680432",
+      "capability_secured_database_storage_8df07551": "d28f0802740351bad6277c1bbc09d378013e6e1eaaa56fbc5a2cde66567a1192",
+      "capability_three_column_kanban_board_7897884e": "cf80289a0191665e52a7666a9bb243bc9f8f1070ffb27b1de949210e71421eb0",
+      "capability_visual_urgency_indicators_79524665": "6f5070672e12881006268e5c155e0329f1f58ab1b6041d26a3d0ee0149cbb4dd"
+    },
+    "foundation_hash": "c567c71ea5928bd532285fc59f999b0cd361939c6ab269724838bd66be89b535"
+  }
+}
