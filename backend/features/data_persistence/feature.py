@@ -1,459 +1,404 @@
-"""
-Data persistence feature module for Flask application.
-Provides user authentication and task management with MySQL persistence.
+"""Canonical account, subject, and homework-task API.
+
+The generated project contained several disconnected persistence and
+authentication implementations. The public full-stack screens use this
+blueprint as the single source of truth.
 """
 
 import re
 import uuid
-from datetime import datetime
+from datetime import date, datetime, timedelta, timezone
 from functools import wraps
 
 import bcrypt
 import jwt
-from flask import Blueprint, request, jsonify, current_app
-from sqlalchemy import create_engine, text
+from flask import Blueprint, current_app, jsonify, request
+from sqlalchemy import (
+    CheckConstraint,
+    Column,
+    Date,
+    DateTime,
+    ForeignKey,
+    MetaData,
+    String,
+    Table,
+    select,
+)
 from sqlalchemy.exc import IntegrityError
 
-blueprint = Blueprint('capability_data_persistence_8e00a8e9', __name__)
+blueprint = Blueprint("capability_data_persistence_8e00a8e9", __name__)
+
+metadata = MetaData()
+users = Table(
+    "f_8e00a8e9__users",
+    metadata,
+    Column("id", String(36), primary_key=True),
+    Column("email", String(255), nullable=False, unique=True),
+    Column("password_hash", String(255), nullable=False),
+    Column("created_at", DateTime, nullable=False),
+)
+subjects = Table(
+    "f_8e00a8e9__subjects",
+    metadata,
+    Column("id", String(36), primary_key=True),
+    Column(
+        "user_id",
+        String(36),
+        ForeignKey("f_8e00a8e9__users.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    Column("name", String(100), nullable=False),
+    Column("created_at", DateTime, nullable=False),
+)
+tasks = Table(
+    "f_8e00a8e9__tasks",
+    metadata,
+    Column("id", String(36), primary_key=True),
+    Column(
+        "user_id",
+        String(36),
+        ForeignKey("f_8e00a8e9__users.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    Column(
+        "subject_id",
+        String(36),
+        ForeignKey("f_8e00a8e9__subjects.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    Column("title", String(255), nullable=False),
+    Column("due_date", Date, nullable=False),
+    Column("priority", String(10), nullable=False),
+    Column("status", String(20), nullable=False),
+    Column("created_at", DateTime, nullable=False),
+    Column("updated_at", DateTime, nullable=False),
+    CheckConstraint("priority IN ('low','medium','high')"),
+    CheckConstraint("status IN ('to_do','in_progress','done')"),
+)
+
+EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
+VALID_PRIORITIES = {"low", "medium", "high"}
+VALID_STATUSES = {"to_do", "in_progress", "done"}
 
 
-def get_db_connection():
-    """Get database connection from Flask app config."""
-    engine = create_engine(current_app.config['SQLALCHEMY_DATABASE_URI'])
-    return engine.connect()
+def _utcnow():
+    """Return naive UTC for MySQL TIMESTAMP and SQLite DateTime columns."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
-def generate_token(user_id, email):
-    """Generate JWT token for authenticated user."""
-    secret_key = current_app.config.get('SECRET_KEY', 'default-secret-key')
-    payload = {
-        'user_id': user_id,
-        'email': email,
-        'exp': datetime.utcnow().timestamp() + 86400  # 24 hours
+def create_schema(engine) -> None:
+    """Create the canonical tables for an isolated test database."""
+    metadata.create_all(engine)
+
+
+def _engine():
+    return current_app.config["DATABASE_ENGINE"]
+
+
+def _json_body():
+    value = request.get_json(silent=True)
+    return value if isinstance(value, dict) else None
+
+
+def _iso(value):
+    return value.isoformat() if value is not None else None
+
+
+def _serialize_subject(row):
+    return {
+        "id": row["id"],
+        "user_id": row["user_id"],
+        "name": row["name"],
+        "created_at": _iso(row["created_at"]),
     }
-    return jwt.encode(payload, secret_key, algorithm='HS256')
 
 
-def decode_token(token):
-    """Decode JWT token and return payload."""
-    secret_key = current_app.config.get('SECRET_KEY', 'default-secret-key')
+def _serialize_task(row):
+    return {
+        "id": row["id"],
+        "user_id": row["user_id"],
+        "subject_id": row["subject_id"],
+        "title": row["title"],
+        "due_date": _iso(row["due_date"]),
+        "priority": row["priority"],
+        "status": row["status"],
+        "created_at": _iso(row["created_at"]),
+        "updated_at": _iso(row["updated_at"]),
+    }
+
+
+def _issue_token(user_id, email):
+    now = datetime.now(timezone.utc)
+    return jwt.encode(
+        {
+            "sub": str(user_id),
+            "email": email,
+            "iss": current_app.config["JWT_ISSUER"],
+            "iat": now,
+            "exp": now + timedelta(hours=24),
+        },
+        current_app.config["SECRET_KEY"],
+        algorithm="HS256",
+    )
+
+
+def _decode_token(token):
     try:
-        return jwt.decode(token, secret_key, algorithms=['HS256'])
-    except jwt.ExpiredSignatureError:
+        return jwt.decode(
+            token,
+            current_app.config["SECRET_KEY"],
+            algorithms=["HS256"],
+            issuer=current_app.config["JWT_ISSUER"],
+        )
+    except jwt.PyJWTError:
         return None
-    except jwt.InvalidTokenError:
-        return None
 
 
-def require_auth(f):
-    """Decorator to require authentication for endpoints."""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return jsonify({'code': 'UNAUTHORIZED', 'message': 'Authentication required'}), 401
-        
-        parts = auth_header.split()
-        if len(parts) != 2 or parts[0].lower() != 'bearer':
-            return jsonify({'code': 'UNAUTHORIZED', 'message': 'Authentication required'}), 401
-        
-        token = parts[1]
-        payload = decode_token(token)
-        if not payload:
-            return jsonify({'code': 'UNAUTHORIZED', 'message': 'Authentication required'}), 401
-        
-        request.user_id = payload['user_id']
-        request.user_email = payload['email']
-        return f(*args, **kwargs)
-    
-    return decorated_function
+def require_auth(handler):
+    @wraps(handler)
+    def wrapped(*args, **kwargs):
+        authorization = request.headers.get("Authorization", "")
+        scheme, _, token = authorization.partition(" ")
+        payload = (
+            _decode_token(token.strip())
+            if scheme.lower() == "bearer" and token.strip()
+            else None
+        )
+        if not payload or not payload.get("sub"):
+            return jsonify({
+                "code": "UNAUTHORIZED",
+                "message": "Authentication required",
+            }), 401
+        request.user_id = str(payload["sub"])
+        request.user_email = payload.get("email")
+        return handler(*args, **kwargs)
+
+    return wrapped
 
 
-def validate_email(email):
-    """Validate email format."""
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(pattern, email) is not None
-
-
-@blueprint.post('/api/capability_data_persistence_8e00a8e9/users')
+@blueprint.post("/api/capability_data_persistence_8e00a8e9/users")
 def create_user():
-    """Create a new student account with hashed password."""
-    data = request.get_json()
-    
-    email = data.get('email', '').strip()
-    password = data.get('password', '')
-    
-    # Validate email format
-    if not email or len(email) < 3 or len(email) > 255 or not validate_email(email):
-        return jsonify({'code': 'INVALID_EMAIL', 'message': 'Email format is invalid'}), 400
-    
-    # Validate password length
-    if not password or len(password) < 8 or len(password) > 255:
-        return jsonify({'code': 'INVALID_PASSWORD', 'message': 'Password must be at least 8 characters'}), 400
-    
-    # Hash password
-    password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    
-    # Generate UUID
+    data = _json_body()
+    if data is None:
+        return jsonify({"code": "INVALID_REQUEST", "message": "A JSON body is required"}), 400
+
+    email_value = data.get("email")
+    password = data.get("password")
+    email = email_value.strip().lower() if isinstance(email_value, str) else ""
+    if not 3 <= len(email) <= 255 or not EMAIL_PATTERN.fullmatch(email):
+        return jsonify({"code": "INVALID_EMAIL", "message": "Email format is invalid"}), 400
+    if not isinstance(password, str) or not 8 <= len(password) <= 255:
+        return jsonify({
+            "code": "INVALID_PASSWORD",
+            "message": "Password must be between 8 and 255 characters",
+        }), 400
+
     user_id = str(uuid.uuid4())
-    
-    conn = get_db_connection()
+    created_at = _utcnow()
+    password_hash = bcrypt.hashpw(
+        password.encode("utf-8"), bcrypt.gensalt()
+    ).decode("utf-8")
     try:
-        # Check if email already exists
-        result = conn.execute(
-            text("SELECT id FROM f_8e00a8e9__users WHERE email = :email"),
-            {'email': email}
-        )
-        if result.fetchone():
-            return jsonify({'code': 'EMAIL_EXISTS', 'message': 'An account with this email already exists'}), 409
-        
-        # Insert new user
-        conn.execute(
-            text("""
-                INSERT INTO f_8e00a8e9__users (id, email, password_hash, created_at)
-                VALUES (:id, :email, :password_hash, :created_at)
-            """),
-            {
-                'id': user_id,
-                'email': email,
-                'password_hash': password_hash,
-                'created_at': datetime.utcnow()
-            }
-        )
-        conn.commit()
-        
-        # Fetch created user
-        result = conn.execute(
-            text("SELECT id, email, created_at FROM f_8e00a8e9__users WHERE id = :id"),
-            {'id': user_id}
-        )
-        user = result.fetchone()
-        
-        return jsonify({
-            'id': user[0],
-            'email': user[1],
-            'created_at': user[2].isoformat()
-        }), 201
-    
+        with _engine().begin() as connection:
+            existing = connection.execute(
+                select(users.c.id).where(users.c.email == email)
+            ).first()
+            if existing:
+                return jsonify({
+                    "code": "EMAIL_EXISTS",
+                    "message": "An account with this email already exists",
+                }), 409
+            connection.execute(
+                users.insert().values(
+                    id=user_id,
+                    email=email,
+                    password_hash=password_hash,
+                    created_at=created_at,
+                )
+            )
     except IntegrityError:
-        conn.rollback()
-        return jsonify({'code': 'EMAIL_EXISTS', 'message': 'An account with this email already exists'}), 409
-    finally:
-        conn.close()
-
-
-@blueprint.post('/api/capability_data_persistence_8e00a8e9/auth/login')
-def authenticate_user():
-    """Authenticate student login credentials."""
-    data = request.get_json()
-    
-    email = data.get('email', '').strip()
-    password = data.get('password', '')
-    
-    if not email or not password:
-        return jsonify({'code': 'INVALID_CREDENTIALS', 'message': 'Email or password is incorrect'}), 401
-    
-    conn = get_db_connection()
-    try:
-        result = conn.execute(
-            text("SELECT id, email, password_hash FROM f_8e00a8e9__users WHERE email = :email"),
-            {'email': email}
-        )
-        user = result.fetchone()
-        
-        if not user:
-            return jsonify({'code': 'INVALID_CREDENTIALS', 'message': 'Email or password is incorrect'}), 401
-        
-        user_id, user_email, password_hash = user[0], user[1], user[2]
-        
-        # Verify password
-        if not bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8')):
-            return jsonify({'code': 'INVALID_CREDENTIALS', 'message': 'Email or password is incorrect'}), 401
-        
-        # Generate token
-        token = generate_token(user_id, user_email)
-        
         return jsonify({
-            'token': token,
-            'user': {
-                'id': user_id,
-                'email': user_email
-            }
-        }), 200
-    
-    finally:
-        conn.close()
+            "code": "EMAIL_EXISTS",
+            "message": "An account with this email already exists",
+        }), 409
+
+    return jsonify({
+        "id": user_id,
+        "email": email,
+        "created_at": _iso(created_at),
+    }), 201
 
 
-@blueprint.post('/api/capability_data_persistence_8e00a8e9/subjects')
+@blueprint.post("/api/capability_data_persistence_8e00a8e9/auth/login")
+def authenticate_user():
+    data = _json_body()
+    if data is None:
+        return jsonify({"code": "INVALID_REQUEST", "message": "A JSON body is required"}), 400
+    email_value = data.get("email")
+    password = data.get("password")
+    email = email_value.strip().lower() if isinstance(email_value, str) else ""
+    if not email or not isinstance(password, str):
+        return jsonify({
+            "code": "INVALID_CREDENTIALS",
+            "message": "Email or password is incorrect",
+        }), 401
+
+    with _engine().connect() as connection:
+        user = connection.execute(
+            select(users).where(users.c.email == email)
+        ).mappings().first()
+    if not user or not bcrypt.checkpw(
+        password.encode("utf-8"), user["password_hash"].encode("utf-8")
+    ):
+        return jsonify({
+            "code": "INVALID_CREDENTIALS",
+            "message": "Email or password is incorrect",
+        }), 401
+
+    return jsonify({
+        "token": _issue_token(user["id"], user["email"]),
+        "user": {"id": user["id"], "email": user["email"]},
+    }), 200
+
+
+@blueprint.post("/api/capability_data_persistence_8e00a8e9/subjects")
 @require_auth
 def create_subject():
-    """Create a school subject for the authenticated student."""
-    data = request.get_json()
-    
-    name = data.get('name', '').strip()
-    
-    # Validate name
-    if not name or len(name) < 1 or len(name) > 100:
-        return jsonify({'code': 'INVALID_NAME', 'message': 'Subject name must be between 1 and 100 characters'}), 400
-    
-    subject_id = str(uuid.uuid4())
-    user_id = request.user_id
-    
-    conn = get_db_connection()
-    try:
-        conn.execute(
-            text("""
-                INSERT INTO f_8e00a8e9__subjects (id, user_id, name, created_at)
-                VALUES (:id, :user_id, :name, :created_at)
-            """),
-            {
-                'id': subject_id,
-                'user_id': user_id,
-                'name': name,
-                'created_at': datetime.utcnow()
-            }
-        )
-        conn.commit()
-        
-        result = conn.execute(
-            text("SELECT id, user_id, name, created_at FROM f_8e00a8e9__subjects WHERE id = :id"),
-            {'id': subject_id}
-        )
-        subject = result.fetchone()
-        
+    data = _json_body()
+    name_value = data.get("name") if data else None
+    name = name_value.strip() if isinstance(name_value, str) else ""
+    if not 1 <= len(name) <= 100:
         return jsonify({
-            'id': subject[0],
-            'user_id': subject[1],
-            'name': subject[2],
-            'created_at': subject[3].isoformat()
-        }), 201
-    
-    finally:
-        conn.close()
+            "code": "INVALID_NAME",
+            "message": "Subject name must be between 1 and 100 characters",
+        }), 400
+
+    subject_id = str(uuid.uuid4())
+    created_at = _utcnow()
+    with _engine().begin() as connection:
+        connection.execute(
+            subjects.insert().values(
+                id=subject_id,
+                user_id=request.user_id,
+                name=name,
+                created_at=created_at,
+            )
+        )
+    return jsonify({
+        "id": subject_id,
+        "user_id": request.user_id,
+        "name": name,
+        "created_at": _iso(created_at),
+    }), 201
 
 
-@blueprint.get('/api/capability_data_persistence_8e00a8e9/subjects')
+@blueprint.get("/api/capability_data_persistence_8e00a8e9/subjects")
 @require_auth
 def list_subjects():
-    """Retrieve all subjects for the authenticated student."""
-    user_id = request.user_id
-    
-    conn = get_db_connection()
-    try:
-        result = conn.execute(
-            text("""
-                SELECT id, user_id, name, created_at
-                FROM f_8e00a8e9__subjects
-                WHERE user_id = :user_id
-                ORDER BY created_at ASC
-            """),
-            {'user_id': user_id}
-        )
-        subjects = result.fetchall()
-        
-        return jsonify({
-            'subjects': [
-                {
-                    'id': subject[0],
-                    'user_id': subject[1],
-                    'name': subject[2],
-                    'created_at': subject[3].isoformat()
-                }
-                for subject in subjects
-            ]
-        }), 200
-    
-    finally:
-        conn.close()
+    with _engine().connect() as connection:
+        rows = connection.execute(
+            select(subjects)
+            .where(subjects.c.user_id == request.user_id)
+            .order_by(subjects.c.created_at, subjects.c.name)
+        ).mappings().all()
+    return jsonify({"subjects": [_serialize_subject(row) for row in rows]}), 200
 
 
-@blueprint.post('/api/capability_data_persistence_8e00a8e9/tasks')
+@blueprint.post("/api/capability_data_persistence_8e00a8e9/tasks")
 @require_auth
 def create_task():
-    """Create a homework task with all required attributes."""
-    data = request.get_json()
-    
-    title = data.get('title', '').strip()
-    subject_id = data.get('subject_id', '').strip()
-    due_date = data.get('due_date', '').strip()
-    priority = data.get('priority', '').strip()
-    
-    # Validate title
-    if not title or len(title) < 1 or len(title) > 255:
-        return jsonify({'code': 'INVALID_TITLE', 'message': 'Title must be between 1 and 255 characters'}), 400
-    
-    # Validate priority
-    if priority not in ['low', 'medium', 'high']:
-        return jsonify({'code': 'INVALID_PRIORITY', 'message': 'Priority must be low, medium, or high'}), 400
-    
-    # Validate due_date format
+    data = _json_body()
+    if data is None:
+        return jsonify({"code": "INVALID_REQUEST", "message": "A JSON body is required"}), 400
+    title_value = data.get("title")
+    title = title_value.strip() if isinstance(title_value, str) else ""
+    subject_id = data.get("subject_id")
+    priority = data.get("priority")
     try:
-        datetime.strptime(due_date, '%Y-%m-%d')
-    except (ValueError, TypeError):
-        return jsonify({'code': 'INVALID_DUE_DATE', 'message': 'Due date must be a valid date'}), 400
-    
-    user_id = request.user_id
+        due_date = date.fromisoformat(str(data.get("due_date", "")))
+    except ValueError:
+        due_date = None
+    if not 1 <= len(title) <= 255:
+        return jsonify({"code": "INVALID_TITLE", "message": "Title must be between 1 and 255 characters"}), 400
+    if priority not in VALID_PRIORITIES:
+        return jsonify({"code": "INVALID_PRIORITY", "message": "Priority must be low, medium, or high"}), 400
+    if due_date is None:
+        return jsonify({"code": "INVALID_DATE", "message": "Due date must use YYYY-MM-DD"}), 400
+
     task_id = str(uuid.uuid4())
-    
-    conn = get_db_connection()
-    try:
-        # Check if subject exists and belongs to user
-        result = conn.execute(
-            text("SELECT id FROM f_8e00a8e9__subjects WHERE id = :subject_id AND user_id = :user_id"),
-            {'subject_id': subject_id, 'user_id': user_id}
+    now = _utcnow()
+    with _engine().begin() as connection:
+        owned_subject = connection.execute(
+            select(subjects.c.id).where(
+                subjects.c.id == subject_id,
+                subjects.c.user_id == request.user_id,
+            )
+        ).first()
+        if not owned_subject:
+            return jsonify({
+                "code": "SUBJECT_NOT_FOUND",
+                "message": "Subject does not exist or does not belong to this user",
+            }), 404
+        connection.execute(
+            tasks.insert().values(
+                id=task_id,
+                user_id=request.user_id,
+                subject_id=subject_id,
+                title=title,
+                due_date=due_date,
+                priority=priority,
+                status="to_do",
+                created_at=now,
+                updated_at=now,
+            )
         )
-        if not result.fetchone():
-            return jsonify({'code': 'SUBJECT_NOT_FOUND', 'message': 'Subject does not exist or does not belong to this user'}), 404
-        
-        # Insert task
-        now = datetime.utcnow()
-        conn.execute(
-            text("""
-                INSERT INTO f_8e00a8e9__tasks 
-                (id, user_id, subject_id, title, due_date, priority, status, created_at, updated_at)
-                VALUES (:id, :user_id, :subject_id, :title, :due_date, :priority, :status, :created_at, :updated_at)
-            """),
-            {
-                'id': task_id,
-                'user_id': user_id,
-                'subject_id': subject_id,
-                'title': title,
-                'due_date': due_date,
-                'priority': priority,
-                'status': 'to_do',
-                'created_at': now,
-                'updated_at': now
-            }
-        )
-        conn.commit()
-        
-        result = conn.execute(
-            text("""
-                SELECT id, user_id, subject_id, title, due_date, priority, status, created_at, updated_at
-                FROM f_8e00a8e9__tasks
-                WHERE id = :id
-            """),
-            {'id': task_id}
-        )
-        task = result.fetchone()
-        
-        return jsonify({
-            'id': task[0],
-            'user_id': task[1],
-            'subject_id': task[2],
-            'title': task[3],
-            'due_date': task[4].isoformat(),
-            'priority': task[5],
-            'status': task[6],
-            'created_at': task[7].isoformat(),
-            'updated_at': task[8].isoformat()
-        }), 201
-    
-    finally:
-        conn.close()
+        row = connection.execute(
+            select(tasks).where(tasks.c.id == task_id)
+        ).mappings().one()
+    return jsonify(_serialize_task(row)), 201
 
 
-@blueprint.get('/api/capability_data_persistence_8e00a8e9/tasks')
+@blueprint.get("/api/capability_data_persistence_8e00a8e9/tasks")
 @require_auth
 def list_tasks():
-    """Retrieve all tasks for the authenticated student."""
-    user_id = request.user_id
-    
-    conn = get_db_connection()
-    try:
-        result = conn.execute(
-            text("""
-                SELECT id, user_id, subject_id, title, due_date, priority, status, created_at, updated_at
-                FROM f_8e00a8e9__tasks
-                WHERE user_id = :user_id
-                ORDER BY created_at ASC
-            """),
-            {'user_id': user_id}
-        )
-        tasks = result.fetchall()
-        
-        return jsonify({
-            'tasks': [
-                {
-                    'id': task[0],
-                    'user_id': task[1],
-                    'subject_id': task[2],
-                    'title': task[3],
-                    'due_date': task[4].isoformat(),
-                    'priority': task[5],
-                    'status': task[6],
-                    'created_at': task[7].isoformat(),
-                    'updated_at': task[8].isoformat()
-                }
-                for task in tasks
-            ]
-        }), 200
-    
-    finally:
-        conn.close()
+    with _engine().connect() as connection:
+        rows = connection.execute(
+            select(tasks)
+            .where(tasks.c.user_id == request.user_id)
+            .order_by(tasks.c.due_date, tasks.c.created_at)
+        ).mappings().all()
+    return jsonify({"tasks": [_serialize_task(row) for row in rows]}), 200
 
 
-@blueprint.patch('/api/capability_data_persistence_8e00a8e9/tasks/<task_id>/status')
+@blueprint.patch("/api/capability_data_persistence_8e00a8e9/tasks/<task_id>/status")
 @require_auth
 def update_task_status(task_id):
-    """Update the Kanban status of a task."""
-    data = request.get_json()
-    
-    status = data.get('status', '').strip()
-    
-    # Validate status
-    if status not in ['to_do', 'in_progress', 'done']:
-        return jsonify({'code': 'INVALID_STATUS', 'message': 'Status must be to_do, in_progress, or done'}), 400
-    
-    user_id = request.user_id
-    
-    conn = get_db_connection()
-    try:
-        # Check if task exists and belongs to user
-        result = conn.execute(
-            text("SELECT id FROM f_8e00a8e9__tasks WHERE id = :task_id AND user_id = :user_id"),
-            {'task_id': task_id, 'user_id': user_id}
-        )
-        if not result.fetchone():
-            return jsonify({'code': 'TASK_NOT_FOUND', 'message': 'Task does not exist or does not belong to this user'}), 404
-        
-        # Update task status
-        conn.execute(
-            text("""
-                UPDATE f_8e00a8e9__tasks
-                SET status = :status, updated_at = :updated_at
-                WHERE id = :task_id
-            """),
-            {
-                'status': status,
-                'updated_at': datetime.utcnow(),
-                'task_id': task_id
-            }
-        )
-        conn.commit()
-        
-        result = conn.execute(
-            text("""
-                SELECT id, user_id, subject_id, title, due_date, priority, status, created_at, updated_at
-                FROM f_8e00a8e9__tasks
-                WHERE id = :id
-            """),
-            {'id': task_id}
-        )
-        task = result.fetchone()
-        
+    data = _json_body()
+    status = data.get("status") if data else None
+    if status not in VALID_STATUSES:
         return jsonify({
-            'id': task[0],
-            'user_id': task[1],
-            'subject_id': task[2],
-            'title': task[3],
-            'due_date': task[4].isoformat(),
-            'priority': task[5],
-            'status': task[6],
-            'created_at': task[7].isoformat(),
-            'updated_at': task[8].isoformat()
-        }), 200
-    
-    finally:
-        conn.close()
+            "code": "INVALID_STATUS",
+            "message": "Status must be to_do, in_progress, or done",
+        }), 400
+
+    with _engine().begin() as connection:
+        existing = connection.execute(
+            select(tasks.c.id).where(
+                tasks.c.id == task_id,
+                tasks.c.user_id == request.user_id,
+            )
+        ).first()
+        if not existing:
+            return jsonify({
+                "code": "TASK_NOT_FOUND",
+                "message": "Task does not exist or does not belong to this user",
+            }), 404
+        connection.execute(
+            tasks.update()
+            .where(tasks.c.id == task_id, tasks.c.user_id == request.user_id)
+            .values(status=status, updated_at=_utcnow())
+        )
+        row = connection.execute(
+            select(tasks).where(tasks.c.id == task_id)
+        ).mappings().one()
+    return jsonify(_serialize_task(row)), 200

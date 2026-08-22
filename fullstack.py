@@ -3,11 +3,27 @@
 import re
 from pathlib import Path
 
-from flask import abort, send_file
+from flask import abort, redirect, send_file
 from backend import create_app as create_backend_app
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-SCREEN_ROUTES = {'/signup': 'frontend/features/data_persistence/sign_up.html', '/login': 'frontend/features/data_persistence/login.html', '/onboarding/subjects': 'frontend/features/data_persistence/add_subjects_onboarding.html', '/board': 'frontend/features/data_persistence/kanban_board.html', '/board#create-task': 'frontend/features/data_persistence/create_task_modal.html', '/board/responsive': 'frontend/features/responsive_design/responsive_kanban_board.html', '/board/responsive/preferences': 'frontend/features/responsive_design/layout_preferences_settings.html', '/register': 'frontend/features/browser_based_platform/registration_screen.html', '/validate-session': 'frontend/features/browser_based_platform/session_validator.html', '/logout': 'frontend/features/browser_based_platform/logout_handler.html', '/board/create-card': 'frontend/features/create_homework_cards/create_homework_card_modal.html', '/board/cards': 'frontend/features/create_homework_cards/homework_card_display.html'}
+SCREEN_ROUTES = {
+    "/signup": "frontend/features/data_persistence/sign_up.html",
+    "/login": "frontend/features/data_persistence/login.html",
+    "/onboarding/subjects": "frontend/features/data_persistence/add_subjects_onboarding.html",
+    "/board": "frontend/features/data_persistence/kanban_board.html",
+    "/board/create-task": "frontend/features/data_persistence/create_task_modal.html",
+    "/board/create-card": "frontend/features/data_persistence/create_task_modal.html",
+    "/board/responsive": "frontend/features/data_persistence/kanban_board.html",
+    "/board/responsive/preferences": "frontend/features/data_persistence/kanban_board.html",
+    "/logout": "frontend/features/data_persistence/logout.html",
+}
+
+ROUTE_ALIASES = {
+    "/register": "/signup",
+    "/validate-session": "/board",
+    "/board/cards": "/board",
+}
 
 
 def _flask_route(route):
@@ -25,15 +41,12 @@ def _project_file(relative_path):
     return target
 
 
-def create_app(testing=False):
-    app = create_backend_app(testing=testing)
+def create_app(testing=False, config=None):
+    app = create_backend_app(testing=testing, config=config)
 
-    @app.get("/static/css/app.css")
-    def frontend_css():
-        return send_file(
-            _project_file("frontend/static/css/app.css"),
-            mimetype="text/css",
-        )
+    @app.get("/")
+    def index():
+        return redirect("/login")
 
     @app.get("/__frontend_assets/<path:relative_path>")
     def frontend_asset(relative_path):
@@ -55,6 +68,17 @@ def create_app(testing=False):
             _flask_route(route),
             endpoint="frontend_screen_" + str(index),
             view_func=serve_screen,
+            methods=["GET"],
+        )
+
+    for index, (route, target) in enumerate(ROUTE_ALIASES.items()):
+        def redirect_alias(_target=target):
+            return redirect(_target)
+
+        app.add_url_rule(
+            route,
+            endpoint="frontend_alias_" + str(index),
+            view_func=redirect_alias,
             methods=["GET"],
         )
     return app

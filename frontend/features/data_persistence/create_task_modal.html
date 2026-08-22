@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="zorentia-compiler" content="{&quot;compiler_version&quot;:&quot;frontend-visual-compiler-v3&quot;,&quot;design_contract_hash&quot;:&quot;9f217d45fc2f6bb9cd7f999be6089af54913e660d27be48082696e8a137601a9&quot;,&quot;route&quot;:&quot;/board#create-task&quot;,&quot;screen_id&quot;:&quot;capability_data_persistence_8e00a8e9.screen.create_task_modal&quot;}">
+  <meta name="zorentia-compiler" content="{&quot;compiler_version&quot;:&quot;frontend-visual-compiler-v3&quot;,&quot;design_contract_hash&quot;:&quot;9f217d45fc2f6bb9cd7f999be6089af54913e660d27be48082696e8a137601a9&quot;,&quot;route&quot;:&quot;/board/create-task&quot;,&quot;screen_id&quot;:&quot;capability_data_persistence_8e00a8e9.screen.create_task_modal&quot;}">
   <title>Create Task · Homework Kanban Board</title>
   <style data-zorentia-compiler="frontend-visual-compiler-v3">:root {
   --primary:#6366F1; --primary-hover:#4338CA;
@@ -129,7 +129,7 @@ svg.w-16{width:4rem!important}svg.h-16{height:4rem!important}
   .field-full { grid-column:auto; }
 }</style>
 </head>
-<body data-screen-route="/board#create-task">
+<body data-screen-route="/board/create-task">
 <div class="app-shell" data-layout="form">
   <aside class="app-sidebar" aria-label="Application navigation">
     <div class="app-brand"><span class="brand-mark" aria-hidden="true">H</span><span>Homework Kanban Board</span></div>
@@ -143,13 +143,8 @@ svg.w-16{width:4rem!important}svg.h-16{height:4rem!important}
     <p style="font-size: 14px; color: #667085; margin: 0;">Add a homework task to your board. All fields are required.</p>
   </div>
 
-  <form data-action-id="capability_data_persistence_8e00a8e9.screen-action.create_task" style="padding: 0 32px 32px;">
-    <div class="alert alert-error" style="display: none; margin-bottom: 24px;" data-error-display>
-      <svg class="icon-sm" style="flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-      </svg>
-      <span data-error-message></span>
-    </div>
+  <form id="task-form" style="padding: 0 32px 32px;">
+    <div id="task-message" class="alert" style="margin-bottom: 24px;" role="status" aria-live="polite" hidden></div>
 
     <div class="form-grid">
       <div class="field field-full">
@@ -170,12 +165,6 @@ svg.w-16{width:4rem!important}svg.h-16{height:4rem!important}
         <label class="label" for="subject_id">Subject</label>
         <select id="subject_id" name="subject_id" class="select" required>
           <option value="">Select a subject...</option>
-          <option value="a1b2c3d4-e5f6-7890-abcd-ef1234567890">Mathematics</option>
-          <option value="b2c3d4e5-f6a7-8901-bcde-f12345678901">Science</option>
-          <option value="c3d4e5f6-a7b8-9012-cdef-123456789012">English</option>
-          <option value="d4e5f6a7-b8c9-0123-def1-234567890123">History</option>
-          <option value="e5f6a7b8-c9d0-1234-ef12-345678901234">Spanish</option>
-          <option value="f6a7b8c9-d0e1-2345-f123-456789012345">Computer Science</option>
         </select>
       </div>
 
@@ -211,7 +200,7 @@ svg.w-16{width:4rem!important}svg.h-16{height:4rem!important}
     </div>
 
     <div class="actions" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #E2E8F0;">
-      <button type="button" class="button-secondary" onclick="window.location.hash = ''; window.location.pathname = '/board';">
+      <button id="cancel-task" type="button" class="button-secondary">
         Cancel
       </button>
       <button type="submit" class="button-primary">
@@ -224,6 +213,7 @@ svg.w-16{width:4rem!important}svg.h-16{height:4rem!important}
   </form>
 </div></main>
     <div class="app-footer"><footer class="app-footer"><div class="container"><div class="footer-content"><div class="footer-section"><p class="footer-brand">Homework Kanban Board</p><p class="footer-tagline">Organize your assignments with ease</p></div><div class="footer-section"><h4 class="footer-heading">Quick Links</h4><ul class="footer-links"><li><a href="/board" class="footer-link">Board</a></li><li><a href="/board/create-card" class="footer-link">Create Task</a></li><li><a href="/onboarding/subjects" class="footer-link">Manage Subjects</a></li></ul></div><div class="footer-section"><h4 class="footer-heading">Account</h4><ul class="footer-links"><li><a href="/login" class="footer-link">Login</a></li><li><a href="/signup" class="footer-link">Sign Up</a></li><li><a href="/board/responsive/preferences" class="footer-link">Settings</a></li></ul></div><div class="footer-section"><h4 class="footer-heading">Status</h4><div class="footer-status"><div class="status-row"><span class="status-label">To Do</span><span class="status-badge status-badge-todo">Active</span></div><div class="status-row"><span class="status-label">In Progress</span><span class="status-badge status-badge-progress">Active</span></div><div class="status-row"><span class="status-label">Done</span><span class="status-badge status-badge-done">Active</span></div></div></div></div><div class="footer-bottom"><p class="footer-copyright">&copy; 2024 Homework Kanban. Built for students, by students.</p><div class="footer-meta"><span class="footer-version">v1.0.0</span><span class="footer-separator">•</span><span class="footer-pwa">PWA Enabled</span></div></div></div></footer></div>
+<script src="/__frontend_assets/frontend/features/data_persistence/api.js" defer></script>
 <script src="/__frontend_assets/frontend/features/data_persistence/create_task_modal.js" defer></script>
   </div>
 </div>
